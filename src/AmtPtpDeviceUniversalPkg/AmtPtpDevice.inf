@@ -88,14 +88,22 @@ AmtPtpHidFilter.sys   = 1,,
 %AmtPtpDeviceUsbUm.DeviceDesc%=AmtPtpDeviceUsbUm_Install, USB\Vid_05ac&Pid_0265&MI_01
 ; Magic Trackpad 2 Bluetooth
 %AmtPtpHidFilter.DeviceDesc%=AmtPtpHidFilter_MiniPortDevice, HID\{00001124-0000-1000-8000-00805f9b34fb}_VID&0001004c_PID&0265&Col01
-%AmtPtpHidFilter.NullDeviceDesc%=AmtPtpHidFilter_NullDevice, HID\{00001124-0000-1000-8000-00805f9b34fb}_VID&0001004c_PID&0265&Col02
+; This auxiliary collection carries Apple's native HID Battery Strength/Battery System report. Leave it to the
+; inbox HID class driver (instead of disabling it) so Windows can surface battery status
+; (Settings > Bluetooth & devices) natively.
+%AmtPtpHidRootDevice.DeviceDesc%=StandardHid_Device, HID\{00001124-0000-1000-8000-00805f9b34fb}_VID&0001004c_PID&0265&Col02
 
-; Null Device
-[AmtPtpHidFilter_NullDevice]
-; Nothing!
+[StandardHid_Device.NT]
+Include = input.inf
+Needs = HID_Inst.NT
 
-[AmtPtpHidFilter_NullDevice.Services]
-AddService = ,2    ; no value for the service name
+[StandardHid_Device.NT.HW]
+Include = input.inf
+Needs = HID_Inst.NT.HW
+
+[StandardHid_Device.NT.Services]
+Include = input.inf
+Needs = HID_Inst.NT.Services
 
 ; File paylods for each set of driver
 [FilterDriver_Payload]
@@ -258,5 +266,4 @@ AmtPtpDeviceUsbKm.SVCDESC = "Apple USB Precision Touchpad Service"
 WudfRdDisplayName = "Windows Driver Foundation - User-mode Driver Framework Reflector"
 AmtPtpHidRootDevice.DeviceDesc = "Apple Multi-touch Trackpad HID Device"
 AmtPtpHidFilter.DeviceDesc = "Apple Multi-touch Trackpad HID Filter"
-AmtPtpHidFilter.NullDeviceDesc = "Apple Multi-touch Auxiliary Services"
 AmtPtpHidFilter.SVCDESC = "Apple Multi-touch Trackpad HID Filter Service"

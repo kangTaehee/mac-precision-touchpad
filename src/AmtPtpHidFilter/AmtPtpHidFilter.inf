@@ -36,15 +36,17 @@ AmtPtpHidFilter.sys  = 1,,
 %AmtPtpHidRootDevice.DeviceDesc%=StandardUsbHid_Device, USB\Vid_05ac&Pid_0265&MI_01
 
 ; The fact is, you can't filter HIDUSB or friends directly, because they load the export driver called
-; HIDCLASS which overrides their IO Major Function pointers. Therefore we still implement our own HID miniport 
+; HIDCLASS which overrides their IO Major Function pointers. Therefore we still implement our own HID miniport
 ; transport, but in fact reusing the underlying HID transport (either Bluetooth or USB).
 ; Some high-level patches involved to modify the underlying driver IO handlers.
 %AmtPtpHidFilter.DeviceDesc%=AmtPtpHidFilter_MiniPortDevice, HID\VID_05AC&PID_0265&REV_0855&MI_01&Col01
 %AmtPtpHidFilter.DeviceDesc%=AmtPtpHidFilter_MiniPortDevice, HID\{00001124-0000-1000-8000-00805f9b34fb}_VID&0001004c_PID&0265&Col01
-; To avoid confusions to OS, disable any other collections.
-%AmtPtpHidFilter.NullDeviceDesc%=AmtPtpHidFilter_NullDevice, HID\VID_05AC&PID_0265&REV_0855&MI_01&Col02
-%AmtPtpHidFilter.NullDeviceDesc%=AmtPtpHidFilter_NullDevice, HID\VID_05AC&PID_0265&REV_0855&MI_01&Col03
-%AmtPtpHidFilter.NullDeviceDesc%=AmtPtpHidFilter_NullDevice, HID\{00001124-0000-1000-8000-00805f9b34fb}_VID&0001004c_PID&0265&Col02
+; These auxiliary collections (Apple's own generic mouse + Battery Strength/HID Battery System reports) are left
+; to the inbox HID class driver so Windows can surface battery status (Settings > Bluetooth & devices) and other
+; standard HID consumers natively, instead of being disabled outright.
+%AmtPtpHidRootDevice.DeviceDesc%=StandardUsbHid_Device, HID\VID_05AC&PID_0265&REV_0855&MI_01&Col02
+%AmtPtpHidRootDevice.DeviceDesc%=StandardUsbHid_Device, HID\VID_05AC&PID_0265&REV_0855&MI_01&Col03
+%AmtPtpHidRootDevice.DeviceDesc%=StandardUsbHid_Device, HID\{00001124-0000-1000-8000-00805f9b34fb}_VID&0001004c_PID&0265&Col02
 
 [FilterDriver_Payload]
 AmtPtpHidFilter.sys
@@ -63,12 +65,6 @@ Needs = HID_Inst.NT.Services
 
 [AmtPtpHidFilter_MiniPortDevice.NT]
 CopyFiles=FilterDriver_Payload
-
-[AmtPtpHidFilter_NullDevice]
-; Nothing!
-
-[AmtPtpHidFilter_NullDevice.Services]
-AddService = ,2    ; no value for the service name
 
 ;-------------- Service installation
 [AmtPtpHidFilter_MiniPortDevice.NT.Services]
@@ -109,5 +105,4 @@ ManufacturerName = "Bingxing Wang"
 DiskName = "Precision Touchpad for Apple Trackpad Installation Disk"
 AmtPtpHidRootDevice.DeviceDesc = "Apple Multi-touch Trackpad HID Device"
 AmtPtpHidFilter.DeviceDesc = "Apple Multi-touch Trackpad HID Filter"
-AmtPtpHidFilter.NullDeviceDesc = "Apple Multi-touch Auxiliary Services"
 AmtPtpHidFilter.SVCDESC = "Apple Multi-touch Trackpad HID Filter Service"

@@ -26,9 +26,15 @@
     <Capability Name="internetClient" />
     <DeviceCapability Name="humaninterfacedevice">
       <Device Id="vidpid:05ac 0265">
-        <!-- Input experience settings -->
+        <!-- Input experience settings (USB) -->
         <Function Type="usage:FF00 0001" />
-        <!-- Battery information -->
+        <!-- Battery information (USB) -->
+        <Function Type="usage:FF00 0014" />
+      </Device>
+      <Device Id="vidpid:004c 0265">
+        <!-- Input experience settings (Bluetooth) -->
+        <Function Type="usage:FF00 0001" />
+        <!-- Battery information (Bluetooth) -->
         <Function Type="usage:FF00 0014" />
       </Device>
     </DeviceCapability>

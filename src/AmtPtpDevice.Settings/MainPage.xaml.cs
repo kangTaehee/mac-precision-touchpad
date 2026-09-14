@@ -55,8 +55,10 @@ namespace AmtPtpDevice.Settings
 
         private void SetupWatcher()
         {
-            m_inputDevice = new UsbHidDeviceAccessSubscription(HidDevice.GetDeviceSelector(0xff00, 0x0001, 0x05ac, 0x0265));
-            m_battery = new UsbHidDeviceAccessSubscription(HidDevice.GetDeviceSelector(0xff00, 0x0014, 0x05ac, 0x0265));
+            // Match by usage page/usage only (no fixed VID/PID) so both USB (VID 0x05AC) and
+            // Bluetooth (VID 0x004C) connected Magic Trackpad 2/3 are picked up.
+            m_inputDevice = new UsbHidDeviceAccessSubscription(HidDevice.GetDeviceSelector(0xff00, 0x0001));
+            m_battery = new UsbHidDeviceAccessSubscription(HidDevice.GetDeviceSelector(0xff00, 0x0014));
 
             m_inputDevice.TargetDeviceAvailable += OnInputDeviceAvailable;
             m_inputDevice.TargetDeviceLost += OnInputDeviceLost;
@@ -92,27 +94,52 @@ namespace AmtPtpDevice.Settings
 
         private async void OnInputDeviceAvailable(object sender, EventArgs e)
         {
-            var sReport = await m_inputDevice.Device.GetFeatureReportAsync(0x09);
-            var ptr = Marshal.AllocHGlobal((int)sReport.Data.Length);
-            Marshal.Copy(sReport.Data.ToArray(), 0, ptr, (int)sReport.Data.Length);
+            // The sensitivity feature report (0x09) is only implemented by the USB
+            // user-mode driver; the Bluetooth HID filter driver doesn't support it.
+            // Treat a failure here as "sensitivity controls unavailable" instead of
+            // crashing the app.
+            try
+            {
+                var sReport = await m_inputDevice.Device.GetFeatureReportAsync(0x09);
+                var ptr = Marshal.AllocHGlobal((int)sReport.Data.Length);
+                Marshal.Copy(sReport.Data.ToArray(), 0, ptr, (int)sReport.Data.Length);
 
-            m_report = Marshal.PtrToStructure<PtpUserModeConfReport>(ptr);
+                m_report = Marshal.PtrToStructure<PtpUserModeConfReport>(ptr);
+                Marshal.FreeHGlobal(ptr);
+
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    // Set value
+                    m_sensitivitySlider.Value = m_report.PressureQualificationLevel;
+                    m_confidenceSlider.Value = m_report.SingleContactSizeQualificationLevel;
+                    m_muConfidenceSlider.Value = m_report.MultipleContactSizeQualificationLevel;
+
+                    m_sensitivitySlider.IsEnabled = true;
+                    m_confidenceSlider.IsEnabled = true;
+                    m_muConfidenceSlider.IsEnabled = true;
+
+                    // Set state
+                    m_isInitialDataPresented = true;
+                });
+            }
+            catch (Exception)
+            {
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    m_sensitivitySlider.IsEnabled = false;
+                    m_confidenceSlider.IsEnabled = false;
+                    m_muConfidenceSlider.IsEnabled = false;
+
+                    m_isInitialDataPresented = false;
+                });
+            }
+
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                // Set value
-                m_sensitivitySlider.Value = m_report.PressureQualificationLevel;
-                m_confidenceSlider.Value = m_report.SingleContactSizeQualificationLevel;
-                m_muConfidenceSlider.Value = m_report.MultipleContactSizeQualificationLevel;
-
                 // Set visibility
                 m_disconnctedView.Visibility = Visibility.Collapsed;
                 m_deviceControl.Visibility = Visibility.Visible;
-
-                // Set state
-                m_isInitialDataPresented = true;
             });
-
-            Marshal.FreeHGlobal(ptr);
         }
 
         private async void ApplySettings()
