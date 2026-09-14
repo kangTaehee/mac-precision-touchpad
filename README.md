@@ -1,3 +1,22 @@
+# 추가사항
+
+## 배터리 트레이 추가
+
+Magic Trackpad 2/3의 배터리 잔량을 작업표시줄(시스템 트레이)에 숫자로 표시해주는 경량 프로그램입니다. 별도의 설치나 인증서 없이 exe 파일 하나로 바로 실행됩니다.
+
+![1789374583543](image/README/1789374583543.png)
+
+- 실행 파일: [`tools/AmtPtpBatteryTray/AmtPtpBatteryTray.exe`](tools/AmtPtpBatteryTray/AmtPtpBatteryTray.exe)
+- 실행하면 트레이 아이콘에 배터리 퍼센트가 표시되며, 30초마다 갱신됩니다.
+- 트레이 아이콘 우클릭 → **종료**로 끌 수 있습니다.
+- **사전 요구사항**: [.NET 9 Desktop Runtime (x64)](https://dotnet.microsoft.com/download/dotnet/9.0)가 설치되어 있어야 합니다.
+- **부팅 시 자동 실행**: `Win+R` → `shell:startup` 입력 후, 위 exe의 바로가기를 그 폴더에 넣으면 됩니다.
+- 소스 코드는 [`src/AmtPtpDevice.TrayBattery`](src/AmtPtpDevice.TrayBattery)에 있습니다 (C#/.NET, Win32 HID API로 배터리 리포트를 직접 읽음).
+
+
+
+
+
 # Windows Precision Touchpad Implementation for Apple MacBook family/Magic Trackpad 2
 
 [![Build Status](https://ligstd.visualstudio.com/_apis/public/build/definitions/7694e0d0-94e3-4fd2-b39a-ecd261e1ba2e/22/badge)](https://ligstd.visualstudio.com/Apple%20PTP%20Trackpad/_build?definitionId=22)
