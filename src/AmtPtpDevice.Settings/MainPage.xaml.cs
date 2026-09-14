@@ -74,7 +74,7 @@ namespace AmtPtpDevice.Settings
             var battReport = Marshal.PtrToStructure<Mt2BatteryStatusReport>(ptr);
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                m_battStatus.Text = $"Battery is {battReport.ChargeStatus}% charged.";
+                m_battStatus.Text = $"배터리 {battReport.ChargeStatus}% 충전됨";
             });
 
             Marshal.FreeHGlobal(ptr);
@@ -150,15 +150,23 @@ namespace AmtPtpDevice.Settings
             m_report.SingleContactSizeQualificationLevel = (byte) m_confidenceSlider.Value;
             m_report.MultipleContactSizeQualificationLevel = (byte) m_muConfidenceSlider.Value;
 
-            var featureReport = m_inputDevice.Device.CreateFeatureReport(0x09);
-            using (var datawriter = new DataWriter())
+            try
             {
-                datawriter.WriteByte(0x09);
-                datawriter.WriteByte(m_report.PressureQualificationLevel);
-                datawriter.WriteByte(m_report.SingleContactSizeQualificationLevel);
-                datawriter.WriteByte(m_report.MultipleContactSizeQualificationLevel);
-                featureReport.Data = datawriter.DetachBuffer();
-                await m_inputDevice.Device.SendFeatureReportAsync(featureReport);
+                var featureReport = m_inputDevice.Device.CreateFeatureReport(0x09);
+                using (var datawriter = new DataWriter())
+                {
+                    datawriter.WriteByte(0x09);
+                    datawriter.WriteByte(m_report.PressureQualificationLevel);
+                    datawriter.WriteByte(m_report.SingleContactSizeQualificationLevel);
+                    datawriter.WriteByte(m_report.MultipleContactSizeQualificationLevel);
+                    featureReport.Data = datawriter.DetachBuffer();
+                    await m_inputDevice.Device.SendFeatureReportAsync(featureReport);
+                }
+            }
+            catch (Exception)
+            {
+                // Device may have been disconnected mid-write, or the report isn't
+                // supported by the current transport. Ignore rather than crash.
             }
         }
 

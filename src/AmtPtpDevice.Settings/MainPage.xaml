@@ -15,33 +15,33 @@
         <Grid Grid.Row="0" Background="{ThemeResource AppBarBackground}">
             <TextBlock Margin="15,0,0,0" VerticalAlignment="Center"
                 Style="{StaticResource BaseTextBlockStyle}">
-                <Run Typography.Capitals="AllPetiteCaps">Input Settings</Run>
+                <Run Typography.Capitals="AllPetiteCaps">입력 설정</Run>
             </TextBlock>
         </Grid>
         <StackPanel x:Name="m_deviceControl" Margin="15,10" Grid.Row="1" Visibility="Collapsed">
             <TextBlock x:Name="m_battStatus" Margin="0,0,0,10"
                     Style="{StaticResource BaseTextBlockStyle}"  />
-            <Slider x:Name="m_sensitivitySlider" 
-                    Minimum="0" Maximum="20" 
+            <Slider x:Name="m_sensitivitySlider"
+                    Minimum="0" Maximum="20"
                     ValueChanged="OnSliderValueChanged"
-                    Header="Touch sensitivity" />
-            <Slider x:Name="m_confidenceSlider" 
-                    Minimum="0" Maximum="25" 
+                    Header="터치 감도" />
+            <Slider x:Name="m_confidenceSlider"
+                    Minimum="0" Maximum="25"
                     ValueChanged="OnConfidenceSliderValueChanged"
-                    Header="Single finger confidence threshold" />
-            <Slider x:Name="m_muConfidenceSlider" 
-                    Minimum="0" Maximum="25" 
+                    Header="한 손가락 신뢰도 임계값" />
+            <Slider x:Name="m_muConfidenceSlider"
+                    Minimum="0" Maximum="25"
                     ValueChanged="OnMuConfidenceSliderValueChanged"
-                    Header="Multiple finger confidence threshold" />
-            <HyperlinkButton Margin="0,10,0,0" 
+                    Header="여러 손가락 신뢰도 임계값" />
+            <HyperlinkButton Margin="0,10,0,0"
                     Click="OnGestureButtonClicked"
-                    Content="Gesture settings" />
+                    Content="제스처 설정" />
             <TextBlock Style="{StaticResource BodyTextBlockStyle}"
-                    Text="Note: Settings won't be persisted for debug purpose. To reset values, unplug and plug in your trackpad." />
+                    Text="참고: 디버그 목적이라 설정이 저장되지 않습니다. 값을 초기화하려면 트랙패드 연결을 해제했다가 다시 연결하세요." />
         </StackPanel>
         <StackPanel x:Name="m_disconnctedView" Margin="15,10" Grid.Row="1">
             <TextBlock Margin="0,0,0,10"
-                       Text="Please connect your device and continue."
+                       Text="장치를 연결한 후 계속하세요."
                        Style="{StaticResource BaseTextBlockStyle}"  />
         </StackPanel>
     </Grid>
