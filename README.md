@@ -5,6 +5,7 @@
 Magic Trackpad 2/3의 배터리 잔량을 작업표시줄(시스템 트레이)에 숫자로 표시해주는 경량 프로그램입니다. 별도의 설치나 인증서 없이 exe 파일 하나로 바로 실행됩니다.
 
 ![1789374583543](image/README/1789374583543.png)
+
 첫번째 아이콘
 
 - 실행 파일: [`tools/AmtPtpBatteryTray/AmtPtpBatteryTray.exe`](tools/AmtPtpBatteryTray/AmtPtpBatteryTray.exe)
